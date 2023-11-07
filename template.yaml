@@ -1,0 +1,27 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  tc-s1-32-lambda
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 20
+    MemorySize: 512
+
+Resources:
+  TechChallengeAuthorizerT32:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      FunctionName: TechChallengeAuthorizerT32
+      CodeUri: TechChallengeAuthorizerT32
+      Handler: br.com.fiap.soat1.t32.App::handleRequest
+      Runtime: java17
+      Tracing: Active
+      Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
+        Variables:
+          # Powertools for AWS Lambda (Java) env vars: https://awslabs.github.io/aws-lambda-powertools-java/#environment-variables
+          POWERTOOLS_LOG_LEVEL: INFO
+          POWERTOOLS_LOGGER_LOG_EVENT: true
+          POWERTOOLS_METRICS_NAMESPACE: TechChallengeAuthorizerT32
+          PARAM1: VALUE
