@@ -37,7 +37,6 @@ public class App implements RequestHandler<APIGatewayCustomAuthorizerEvent, Simp
 
         try {
             final var authorization = getTokenObject(input);
-            log.info("Authorization is " + (authorization != null ? authorization.toString() : "null"));
             if (isNull(authorization) ||
                     isExpired(authorization.getExpiresAt())
                             || (authorization.getDocument() != null
@@ -46,7 +45,7 @@ public class App implements RequestHandler<APIGatewayCustomAuthorizerEvent, Simp
             }
 
         } catch (IOException e) {
-            log.error("Falha ao processar token", e);
+            log.error("Falha ao processar autorização", e);
             return new SimpleAuthorizer(Boolean.FALSE);
         }
 
