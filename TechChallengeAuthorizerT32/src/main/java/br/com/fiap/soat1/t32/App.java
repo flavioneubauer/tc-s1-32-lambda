@@ -1,27 +1,27 @@
 package br.com.fiap.soat1.t32;
 
-import br.com.fiap.soat1.t32.models.TokenDTO;
-import br.com.fiap.soat1.t32.models.response.SimpleAuthorizer;
-import br.com.fiap.soat1.t32.utils.Cpf;
+import static java.util.Objects.isNull;
+import static software.amazon.lambda.powertools.tracing.CaptureMode.DISABLED;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
+
+import org.apache.http.HttpHeaders;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayCustomAuthorizerEvent;
 import com.amazonaws.util.Base64;
-import com.amazonaws.util.StringUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.http.HttpHeaders;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
+import br.com.fiap.soat1.t32.models.TokenDTO;
+import br.com.fiap.soat1.t32.models.response.SimpleAuthorizer;
+import br.com.fiap.soat1.t32.utils.Cpf;
 import software.amazon.lambda.powertools.logging.Logging;
 import software.amazon.lambda.powertools.metrics.Metrics;
 import software.amazon.lambda.powertools.tracing.Tracing;
-
-import java.io.IOException;
-import java.time.LocalDateTime;
-
-import static java.util.Objects.isNull;
-import static software.amazon.lambda.powertools.tracing.CaptureMode.DISABLED;
 
 /**
  * Handler for requests to Lambda function.
@@ -36,7 +36,7 @@ public class App implements RequestHandler<APIGatewayCustomAuthorizerEvent, Simp
 
         try {
             final var authorization = getTokenObject(input);
-
+            log.info("Authorization is " + authorization.toString());
             if (isNull(authorization) ||
                     isExpired(authorization.getExpiresAt())
                             || (authorization.getDocument() != null
@@ -45,6 +45,7 @@ public class App implements RequestHandler<APIGatewayCustomAuthorizerEvent, Simp
             }
 
         } catch (IOException e) {
+            log.error("Falha ao processar token", e);
             return new SimpleAuthorizer(Boolean.FALSE);
         }
 
