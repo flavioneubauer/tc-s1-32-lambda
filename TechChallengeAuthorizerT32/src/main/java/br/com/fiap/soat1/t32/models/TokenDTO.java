@@ -1,15 +1,17 @@
 package br.com.fiap.soat1.t32.models;
 
+import java.time.LocalDateTime;
+
 public class TokenDTO {
 
     private String document;
-    private String expiresAt;
+    private LocalDateTime expiresAt;
 
     public String getDocument() {
         return document;
     }
 
-    public String getExpiresAt() {
+    public LocalDateTime getExpiresAt() {
         return expiresAt;
     }
 
@@ -17,7 +19,7 @@ public class TokenDTO {
         this.document = document;
     }
 
-    public void setExpiresAt(String expiresAt) {
+    public void setExpiresAt(LocalDateTime expiresAt) {
         this.expiresAt = expiresAt;
     }
 }
