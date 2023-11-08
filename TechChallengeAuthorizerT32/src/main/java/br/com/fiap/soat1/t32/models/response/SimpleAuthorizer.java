@@ -11,7 +11,7 @@ public class SimpleAuthorizer {
         this.isAuthorized = isAuthorized;
     }
 
-    public Boolean getAuthorized() {
+    public Boolean getIsAuthorized() {
         return isAuthorized;
     }
 

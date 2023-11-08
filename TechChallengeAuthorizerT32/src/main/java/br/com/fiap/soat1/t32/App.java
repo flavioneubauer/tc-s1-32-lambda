@@ -2,6 +2,8 @@ package br.com.fiap.soat1.t32;
 
 import br.com.fiap.soat1.t32.models.TokenDTO;
 import br.com.fiap.soat1.t32.models.response.SimpleAuthorizer;
+import br.com.fiap.soat1.t32.utils.Cpf;
+
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayCustomAuthorizerEvent;
@@ -16,6 +18,7 @@ import software.amazon.lambda.powertools.metrics.Metrics;
 import software.amazon.lambda.powertools.tracing.Tracing;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 import static java.util.Objects.isNull;
 import static software.amazon.lambda.powertools.tracing.CaptureMode.DISABLED;
@@ -34,9 +37,10 @@ public class App implements RequestHandler<APIGatewayCustomAuthorizerEvent, Simp
         try {
             final var authorization = getTokenObject(input);
 
-            if(isNull(authorization) ||
-                StringUtils.isNullOrEmpty(authorization.getDocument()) ||
-                StringUtils.isNullOrEmpty(authorization.getExpiresAt())) {
+            if (isNull(authorization) ||
+                    isExpired(authorization.getExpiresAt())
+                            || (authorization.getDocument() != null
+                                    && !Cpf.isValido(authorization.getDocument()))) {
                 return new SimpleAuthorizer(Boolean.FALSE);
             }
 
@@ -47,20 +51,24 @@ public class App implements RequestHandler<APIGatewayCustomAuthorizerEvent, Simp
         return new SimpleAuthorizer(Boolean.TRUE);
     }
 
+    private boolean isExpired(LocalDateTime expiration) {
+        return expiration.isBefore(LocalDateTime.now());
+    }
+
     private TokenDTO getTokenObject(final APIGatewayCustomAuthorizerEvent input) throws IOException {
         final var headers = input.getHeaders();
 
-        if(headers.isEmpty()) {
+        if (headers.isEmpty()) {
             return null;
         }
 
         var authorizationHeader = headers.get(HttpHeaders.AUTHORIZATION);
 
-        if(isNull(authorizationHeader)) {
+        if (isNull(authorizationHeader)) {
             return null;
         }
 
-        if(authorizationHeader.toLowerCase().startsWith("bearer ")){
+        if (authorizationHeader.toLowerCase().startsWith("bearer ")) {
             authorizationHeader = authorizationHeader.split(" ")[1].trim();
         }
 
