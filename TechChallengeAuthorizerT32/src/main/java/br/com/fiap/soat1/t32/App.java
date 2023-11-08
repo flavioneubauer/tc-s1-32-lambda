@@ -15,6 +15,7 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayCustomAuthorizerEvent;
 import com.amazonaws.util.Base64;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import br.com.fiap.soat1.t32.models.TokenDTO;
 import br.com.fiap.soat1.t32.models.response.SimpleAuthorizer;
@@ -36,7 +37,7 @@ public class App implements RequestHandler<APIGatewayCustomAuthorizerEvent, Simp
 
         try {
             final var authorization = getTokenObject(input);
-            log.info("Authorization is " + authorization.toString());
+            log.info("Authorization is " + (authorization != null ? authorization.toString() : "null"));
             if (isNull(authorization) ||
                     isExpired(authorization.getExpiresAt())
                             || (authorization.getDocument() != null
@@ -73,6 +74,13 @@ public class App implements RequestHandler<APIGatewayCustomAuthorizerEvent, Simp
             authorizationHeader = authorizationHeader.split(" ")[1].trim();
         }
 
-        return new ObjectMapper().readValue(Base64.decode(authorizationHeader), TokenDTO.class);
+        return getObjectMapper().readValue(Base64.decode(authorizationHeader), TokenDTO.class);
     }
+
+    private ObjectMapper getObjectMapper(){
+        var objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        return objectMapper;
+    }
+
 }
