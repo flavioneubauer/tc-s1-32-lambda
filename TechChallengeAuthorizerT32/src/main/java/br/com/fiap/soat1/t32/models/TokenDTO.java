@@ -22,4 +22,9 @@ public class TokenDTO {
     public void setExpiresAt(LocalDateTime expiresAt) {
         this.expiresAt = expiresAt;
     }
+
+    @Override
+    public String toString() {
+        return "TokenDTO [document=" + document + ", expiresAt=" + expiresAt + "]";
+    }
 }
