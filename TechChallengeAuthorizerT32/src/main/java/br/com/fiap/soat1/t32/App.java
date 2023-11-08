@@ -38,7 +38,6 @@ public class App implements RequestHandler<APIGatewayCustomAuthorizerEvent, Simp
         try {
             final var authorization = getTokenObject(input);
 
-            log.info(getObjectMapper().writeValueAsString(authorization));
             if (isNull(authorization) ||
                     isExpired(authorization.getExpiresAt())
                             || (authorization.getDocument() != null
@@ -51,8 +50,6 @@ public class App implements RequestHandler<APIGatewayCustomAuthorizerEvent, Simp
             return new SimpleAuthorizer(Boolean.FALSE);
         }
 
-        log.info("RETORNOU TRUE");
-
         return new SimpleAuthorizer(Boolean.TRUE);
     }
 
@@ -61,13 +58,7 @@ public class App implements RequestHandler<APIGatewayCustomAuthorizerEvent, Simp
     }
 
     private TokenDTO getTokenObject(final APIGatewayCustomAuthorizerEvent input) throws IOException {
-        final var headers = input.getHeaders();
-
-        if (headers.isEmpty()) {
-            return null;
-        }
-
-        var authorizationHeader = headers.get(HttpHeaders.AUTHORIZATION);
+        var authorizationHeader = input.getIdentitySource();
 
         if (isNull(authorizationHeader)) {
             return null;
